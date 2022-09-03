@@ -1,5 +1,6 @@
 import discord
 import os
+import random
 from dotenv import load_dotenv
 import requests
 
@@ -35,14 +36,18 @@ async def on_message(message):
             await message.channel.send('Hello!')
 
         if command == "askQuestion":
-            await getReq(message, msg)
-
+            data = getReq()
+            len = data.length
+            await message.channel.send(data[random.randint(0,len)]['ImageLink']) # this is the link to the image randomly choose object
+            await message.channel.send('what is this?')
 # gets data from the server and store into memory
 
 
-async def getReq(message, msg):
+async def getReq():
     URL = ''  # url of the api where you're going to import
-    response = requests.get(URL)
-    print(response)
+    response = await requests.get(URL)
+    print(response.json())
+    return response.json
+    
 
 client.run(DISCORD_TOKEN)
