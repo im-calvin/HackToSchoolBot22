@@ -5,7 +5,10 @@ from dotenv import load_dotenv
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 
-client = discord.Client() # this is the object for the discord Client library
+intents = discord.Intents.default()
+intents.message_content = True
+
+client = discord.Client(intents=intents) # this is the object for the discord Client library
 
 PREFIX = '!'
 
@@ -19,3 +22,10 @@ async def on_ready():
 async def on_message(message):
   if message.content[0] == PREFIX:
     msg = message.content[1:].split(' ') # msg is basically the actual contents of the command. ie: !asdf, msg = asdf
+
+    if msg == "hello":
+      await message.channel.send('Hello!')
+
+client.run(DISCORD_TOKEN)
+  # elif message.author == client.user:
+  #   return
