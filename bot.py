@@ -38,13 +38,19 @@ async def on_message(message):
         if command == "askQuestion":
             data = getReq()
             len = data.length
-            await message.channel.send(data[random.randint(0,len)]['ImageLink']) # this is the link to the image randomly choose object
+            index = random.randint(0,len)
+            await message.channel.send(data[index]['ImageLink']) # this is the link to the image randomly choose object
             await message.channel.send('what is this?')
+            # ans = data[index]['name'] is the answer to the question 
+            # response == ans 
+            # send a message to the user saying if they got it right or wrong, exit while loop,
+            # and once everything is finished work on leaderboard
+
 # gets data from the server and store into memory
 
 
 async def getReq():
-    URL = ''  # url of the api where you're going to import
+    URL = 'localhost:3000/api/getAll'  # url of the api where you're going to import
     response = await requests.get(URL)
     print(response.json())
     return response.json
