@@ -29,17 +29,18 @@ async def on_message(message):
         msg = message.content[1:].split(' ')
         # command is the first word from the msg string
         command = msg[0].strip()
+        args = msg[1].strip()
 
         if command == "hello":
             await message.channel.send('Hello!')
 
-        if command == "get":
-            await GetReq(message, msg)
+        if command == "askQuestion":
+            await getReq(message, msg)
 
 # gets data from the server and store into memory
 
 
-async def GetReq(message, msg):
+async def getReq(message, msg):
     URL = ''  # url of the api where you're going to import
     response = requests.get(URL)
     print(response)
