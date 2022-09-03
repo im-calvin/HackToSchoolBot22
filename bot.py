@@ -3,6 +3,8 @@ import os
 import random
 from dotenv import load_dotenv
 import requests
+import io
+import aiohttp
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
@@ -43,10 +45,12 @@ async def on_message(message):
             index = random.randint(0,dataLen)
             await message.channel.send(data[index]['ImageLink']) # this is the link to the image randomly choose object
             await message.channel.send('what is this?')
+
             # ans = data[index]['name'] is the answer to the question 
             # response == ans 
             # send a message to the user saying if they got it right or wrong, exit while loop,
             # and once everything is finished work on leaderboard
+
 
 # gets data from the server and store into memory
 
