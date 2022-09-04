@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import requests
 import io
 import aiohttp
+from profiles import InsertProfile, PullProfile
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
@@ -103,15 +104,36 @@ async def askQuestion(message, difficulty):
     await message.channel.send('what is this? (respond in form of "answer")')
 
     try:
-        currMSG = await client.wait_for('message', timeout=60.0)
-        cleanMSG = currMSG.content.strip().lower()
+        x = False
+        while (x == False):
+            def check(m):
+                return m.content and user
+            currMSG, user = await client.wait_for('message', timeout=60.0, check=check)
+            cleanMSG = currMSG.content.strip().lower()
+            if cleanMSG == answer:
+                await message.channel.send('Correct!')
+                userDict = PullProfile(user.id, user.message.channel.id)
+                displayName = user.display_name
+                if userDict == 'bruh what':
+                    userDict = {
+                        # initialize userDict
+                    }
+                    points = 1
+                    sendMsg = f'{displayName} has {points} points!'
+                    await message.channel.send(sendMsg)
+                    InsertProfile(userDict)
+                    x = True
+                # adding points to user
+                points = userDict['points']
+                userDict['points'] = points + 1
+                sendMsg = f'{displayName} has {points} points!'
+                await message.channel.send(sendMsg)
+                await InsertProfile(userDict)
+                x = True
 
-        if cleanMSG == answer:
-            await message.channel.send('Correct!')
-            # update scores/database
-
-        elif cleanMSG == 'quit':
-            await message.channel.send('You suck')
+            elif cleanMSG == 'quit':
+                await message.channel.send('You suck')
+                x = True
 
     except asyncio.TimeoutError:
         await message.channel.send('Timeout')
