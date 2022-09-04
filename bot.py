@@ -72,14 +72,15 @@ async def on_message(message):
 
 
 async def getALL(message):
-    URL = "http://localhost:3000/api/organic_compounds"  # url of the api where you're going to import
+    # url of the api where you're going to import
+    URL = 'https://organic-chemistry-api.azurewebsites.net/api/organic_compounds/'
     response = requests.get(URL)
 
     return response.json()
 
 
 async def getFromDifficulty(message, difficulty):
-    URL = "http://localhost:3000/api/organic_compounds/" + difficulty
+    URL = 'https://organic-chemistry-api.azurewebsites.net/api/organic_compounds/' + difficulty
     response = requests.get(URL)
 
     return response.json()
