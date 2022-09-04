@@ -49,45 +49,17 @@ async def on_message(message):
               
               if (cleanMSG == "easy") or (cleanMSG == "medium") or (cleanMSG == "hard") or (cleanMSG == "any"):
                 difficulty = cleanMSG 
-                await askQuestion(message,difficulty)
+                askQuestion(message,difficulty)
               else:
                 await message.channel.send('Invalid Input')
                 return
 
-             
-
             except asyncio.TimeoutError:
               await message.channel.send("You took too long to respond")
+
           
-            # data = await getALL(message)
-            # dataLen = len(data)
-            # index = random.randint(0,dataLen)
-            # answer = data[index]['Name'].strip().lower()
-            # print(answer)
-            # await message.channel.send(data[index]['ImageLink']) # this is the link to the image randomly choose object
-            # await message.channel.send('what is this? (respond in form of "answer")')
-
-
-    
-            # try:
-            #   currMSG = await client.wait_for('message',timeout = 60.0)
-            #   print(currMSG.content)
-            #   if currMSG.content == answer:
-            #     await message.channel.send('Correct!')
-
-            #   elif(currMSG.content == 'quit'):
-            #     await message.channel.send('You suck')
-            
-  
-            # except asyncio.TimeoutError:
-            #   await message.channel.send('Timeout')
-            
-              
-                  
-            # ans = data[index]['name'] is the answer to the question 
-            # response == ans 
-            # send a message to the user saying if they got it right or wrong, exit while loop,
-            # and once everything is finished work on leaderboard
+          
+        
         
 # gets data from the server and store into memory
 
@@ -113,7 +85,6 @@ async def askQuestion(message,difficulty):
   if (difficulty == "any"):
     data = await getALL(message)
     
-
   else:
     data = await getFromDifficulty(message, difficulty)
 
@@ -128,10 +99,11 @@ async def askQuestion(message,difficulty):
 
   try:
     currMSG = await client.wait_for('message',timeout = 60.0)
-    # print(currMSG.content)
     cleanMSG = currMSG.content.strip().lower()
+
     if cleanMSG == answer:
       await message.channel.send('Correct!')
+      # update scores/database
 
     elif cleanMSG == 'quit':
       await message.channel.send('You suck')
