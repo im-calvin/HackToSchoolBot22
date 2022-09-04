@@ -68,6 +68,15 @@ async def on_message(message):
 
             except asyncio.TimeoutError:
                 await message.channel.send("You took too long to respond")
+        if command == "top":
+            cur = profiles.PullAll()
+            embedVar = discord.Embed(title='Leaderboard', color=0xfcc174)
+            for doc in cur:  # doc is each individual dictionary
+                userID = doc['userID']
+                points = doc['points']
+                userName = client.get_user(userID).display_name
+                embedVar.add_field(name=userName, value=points, inline=False)
+            await message.channel.send(embed=embedVar)
 
 
 # gets data from the server and store into memory

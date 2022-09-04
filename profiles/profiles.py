@@ -20,7 +20,8 @@ collection = db.profiles  # the profiles object
 # method that takes a dictionary and inserts it into the mongodb profiles dict
 
 def PullAll():
-    data = collection.find().sort('points')  # all the data inside profiles
+    # all the data inside profiles
+    data = collection.find().sort('points', direction=-1)
     return data
 
 
