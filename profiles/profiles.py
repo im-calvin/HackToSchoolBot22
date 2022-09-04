@@ -24,10 +24,17 @@ def InsertProfile(ProfDict):
     collection.insert_one(ProfDict)
 
 
-def UpdateProfile(points, mongoID, userID, chID, ProfDict):
+def UpdateProfile(points, mongoID, ProfDict):
     x = collection.find_one(ProfDict)
+    newvalues = {
+        "$set": {
+            'points': points}
+    }
+    filter = {
+        '_id': mongoID
+    }
     collection.update_one(
-        {'$points': points, '_id': mongoID, '$userID': userID, '$chID': chID}, upsert=False)
+        filter, newvalues)
 
 # returns the profile from the database, 'bruh what' on error
 

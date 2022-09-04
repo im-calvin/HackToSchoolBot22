@@ -107,7 +107,7 @@ async def askQuestion(message, difficulty):
         x = False
         while (x == False):
             currMSG = await client.wait_for('message', timeout=60.0)
-            user = message.author
+            user = currMSG.author
             cleanMSG = currMSG.content.strip().lower()
             if cleanMSG == answer:
                 await message.channel.send('Correct!')
@@ -132,7 +132,8 @@ async def askQuestion(message, difficulty):
                 sendMsg = f'{displayName} has {points} points!'
                 await message.channel.send(sendMsg)
                 mongoID = userDict['_id']
-                await profiles.UpdateProfile(points, mongoID, user.id, message.channel.id, userDict)
+                profiles.UpdateProfile(
+                    points, mongoID, userDict)
                 x = True
 
             elif cleanMSG == 'quit':
