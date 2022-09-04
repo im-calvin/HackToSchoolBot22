@@ -47,7 +47,7 @@ async def on_message(message):
               currMSG = await client.wait_for('message', timeout = 60.0)
               cleanMSG = currMSG.content.strip().lower()
               
-              if cleanMSG == "easy" or cleanMSG == "medium" or cleanMSG == "hard" or cleanMSG == "any":
+              if (cleanMSG == "easy") or (cleanMSG == "medium") or (cleanMSG == "hard") or (cleanMSG == "any"):
                 difficulty = cleanMSG 
                 await askQuestion(message,difficulty)
               else:
@@ -95,15 +95,17 @@ async def on_message(message):
 async def getALL(message):
     URL = 'http://localhost:3000/api/organic_compounds'  # url of the api where you're going to import
     response = requests.get(URL)
-    # later test for response.status_code works, prob dont have to but its good practice
-    print(response.status_code)
+    # later test for response.status_code works, prob dont have to but its good practic
+    print(response.json())
     return response.json()
 
 
 async def getFromDifficulty(message, difficulty):
     URL = 'http://localhost:3000/api/organic_compounds/' + difficulty
     response = requests.get(URL)
+    print("wrong")
     print(response.status_code)
+    print(response.json())
     return response.json()
 
 async def askQuestion(message,difficulty):
@@ -116,9 +118,11 @@ async def askQuestion(message,difficulty):
     data = await getFromDifficulty(message, difficulty)
 
   dataLen = len(data)
+  print('dataLen: ' + str(dataLen))
   index = random.randint(0,dataLen)
+  print('index: ' + str(index))
   answer = data[index]['Name'].strip().lower()
-  print(answer)
+  print("answer: " + str(answer))
   await message.channel.send(data[index]['ImageLink']) # this is the link to the image randomly choose object
   await message.channel.send('what is this? (respond in form of "answer")')
 
