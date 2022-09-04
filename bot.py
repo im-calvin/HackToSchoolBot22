@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import requests
 import io
 import aiohttp
+from profiles import profiles
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
@@ -29,6 +30,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    if message.author == client.user:
+        return
+
     if message.content[0] == PREFIX:
         # msg is basically the actual contents of the command. ie: !asdf, msg = asdf
         msg = message.content[1:].split(" ")
@@ -70,21 +74,19 @@ async def on_message(message):
 async def getALL(message):
     URL = "http://localhost:3000/api/organic_compounds"  # url of the api where you're going to import
     response = requests.get(URL)
-    # later test for response.status_code works, prob dont have to but its good practic
-    print(response.json())
+
     return response.json()
 
 
 async def getFromDifficulty(message, difficulty):
     URL = "http://localhost:3000/api/organic_compounds/" + difficulty
     response = requests.get(URL)
-    print("wrong")
-    print(response.status_code)
-    print(response.json())
+
     return response.json()
 
 
-async def askQuestion(message, difficulty):
+
+async def askQuestion(message,  difficulty):
 
     if difficulty == "any":
         data = await getALL(message)
