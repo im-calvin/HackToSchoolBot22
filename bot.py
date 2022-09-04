@@ -28,11 +28,14 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    if message.author == client.user:
+        return
+
     if message.content[0] == PREFIX:
         # msg is basically the actual contents of the command. ie: !asdf, msg = asdf
         msg = message.content[1:].split(' ')
         # command is the first word from the msg string
-        command = msg[0].strip()
+        command = msg[0].strip().lower()
         if (len(msg) >= 1):
             args = msg[1:]
 
@@ -42,25 +45,25 @@ async def on_message(message):
         if command == 'help':
             await message.channel.send('Documentation does not exist at this moment. Have a nice day!')
 
-        if command == "askQuestion":
+        if command == "askquestion" or command == 'askq':
             # data =
             await message.channel.send('Respond with one of the following difficulities:\n(Easy/Medium/Hard/Any)')
-
             try:
-                currMSG = await client.wait_for('message', timeout=60.0)
-                cleanMSG = currMSG.content.strip().lower()
+                x = False
+                while (x == False):
+                    currMSG = await client.wait_for('message', timeout=60.0)
+                    cleanMSG = currMSG.content.strip().lower()
+                    try:
+                        if (cleanMSG == "easy") or (cleanMSG == "medium") or (cleanMSG == "hard") or (cleanMSG == "any"):
+                            difficulty = cleanMSG
+                            x = True
+                            await askQuestion(message, difficulty)
 
-                try:
-                    if (cleanMSG == "easy") or (cleanMSG == "medium") or (cleanMSG == "hard") or (cleanMSG == "any"):
-                        difficulty = cleanMSG
-                        await askQuestion(message, difficulty)
-                    else:
+                        else:
+                            await message.channel.send('Invalid Input')
+
+                    except:
                         await message.channel.send('Invalid Input')
-                        return
-
-                except:
-                    await message.channel.send('Invalid Input')
-                    return
 
             except asyncio.TimeoutError:
                 await message.channel.send("You took too long to respond")
@@ -73,17 +76,14 @@ async def getALL(message):
     # url of the api where you're going to import
     URL = 'http://localhost:3000/api/organic_compounds'
     response = requests.get(URL)
-    # later test for response.status_code works, prob dont have to but its good practic
-    print(response.json())
+
     return response.json()
 
 
 async def getFromDifficulty(message, difficulty):
     URL = 'http://localhost:3000/api/organic_compounds/' + difficulty
     response = requests.get(URL)
-    print("wrong")
-    print(response.status_code)
-    print(response.json())
+
     return response.json()
 
 
@@ -96,11 +96,8 @@ async def askQuestion(message, difficulty):
         data = await getFromDifficulty(message, difficulty)
 
     dataLen = len(data)
-    print('dataLen: ' + str(dataLen))
     index = random.randint(0, dataLen)
-    print('index: ' + str(index))
     answer = data[index]['Name'].strip().lower()
-    print("answer: " + str(answer))
     # this is the link to the image randomly choose object
     await message.channel.send(data[index]['ImageLink'])
     await message.channel.send('what is this? (respond in form of "answer")')
