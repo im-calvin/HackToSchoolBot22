@@ -41,16 +41,21 @@ async def on_message(message):
 
         if command == "askQuestion":
             # data = 
-            await message.channel.send('Easy/Medium/Hard/Any?')
+            await message.channel.send('Respond with one of the following difficulities:\n(Easy/Medium/Hard/Any)')
 
             try:
               currMSG = await client.wait_for('message', timeout = 60.0)
               cleanMSG = currMSG.content.strip().lower()
               
-              if (cleanMSG == "easy") or (cleanMSG == "medium") or (cleanMSG == "hard") or (cleanMSG == "any"):
-                difficulty = cleanMSG 
-                askQuestion(message,difficulty)
-              else:
+              try:
+                if (cleanMSG == "easy") or (cleanMSG == "medium") or (cleanMSG == "hard") or (cleanMSG == "any"):
+                  difficulty = cleanMSG 
+                  await askQuestion(message,difficulty)
+                else:
+                  await message.channel.send('Invalid Input')
+                  return
+                  
+              except:
                 await message.channel.send('Invalid Input')
                 return
 
