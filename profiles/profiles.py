@@ -24,8 +24,19 @@ def InsertProfile(ProfDict):
     collection.insert_one(ProfDict)
 
 
+def UpdateProfile(points, mongoID, userID, chID, ProfDict):
+    x = collection.find_one(ProfDict)
+    collection.update_one(
+        {'$points': points, '_id': mongoID, '$userID': userID, '$chID': chID}, upsert=False)
+
 # returns the profile from the database, 'bruh what' on error
-def PullProfile(ProfDict):
+
+
+def PullProfile(userID, chID):
+    ProfDict = {
+        'userID': userID,
+        'chID': chID
+    }
     x = collection.find_one(ProfDict)
     if x == None:  # there are no matches
         return 'bruh what'

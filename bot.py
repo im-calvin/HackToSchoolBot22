@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import requests
 import io
 import aiohttp
-from profiles import InsertProfile, PullProfile
+from profiles import profiles
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
@@ -57,13 +57,13 @@ async def on_message(message):
                     try:
                         if (cleanMSG == "easy") or (cleanMSG == "medium") or (cleanMSG == "hard") or (cleanMSG == "any"):
                             difficulty = cleanMSG
-                            x = True
                             await askQuestion(message, difficulty)
+                            x = True
 
                         else:
                             await message.channel.send('Invalid Input')
 
-                    except:
+                    except asyncio.TimeoutError:
                         await message.channel.send('Invalid Input')
 
             except asyncio.TimeoutError:
@@ -97,7 +97,7 @@ async def askQuestion(message, difficulty):
         data = await getFromDifficulty(message, difficulty)
 
     dataLen = len(data)
-    index = random.randint(0, dataLen)
+    index = random.randint(0, dataLen-1)
     answer = data[index]['Name'].strip().lower()
     # this is the link to the image randomly choose object
     await message.channel.send(data[index]['ImageLink'])
@@ -106,29 +106,33 @@ async def askQuestion(message, difficulty):
     try:
         x = False
         while (x == False):
-            def check(m):
-                return m.content and user
-            currMSG, user = await client.wait_for('message', timeout=60.0, check=check)
+            currMSG = await client.wait_for('message', timeout=60.0)
+            user = message.author
             cleanMSG = currMSG.content.strip().lower()
             if cleanMSG == answer:
                 await message.channel.send('Correct!')
-                userDict = PullProfile(user.id, user.message.channel.id)
+                userDict = profiles.PullProfile(
+                    user.id, message.channel.id)
                 displayName = user.display_name
                 if userDict == 'bruh what':
-                    userDict = {
-                        # initialize userDict
-                    }
                     points = 1
+                    ProfDict = {
+                        'userID': user.id,
+                        'chID': message.channel.id,
+                        'points': points
+                    }
                     sendMsg = f'{displayName} has {points} points!'
                     await message.channel.send(sendMsg)
-                    InsertProfile(userDict)
+                    profiles.InsertProfile(ProfDict)
                     x = True
+                    break
                 # adding points to user
-                points = userDict['points']
-                userDict['points'] = points + 1
+                points = userDict['points'] + 1
+                userDict['points'] = points
                 sendMsg = f'{displayName} has {points} points!'
                 await message.channel.send(sendMsg)
-                await InsertProfile(userDict)
+                mongoID = userDict['_id']
+                await profiles.UpdateProfile(points, mongoID, user.id, message.channel.id, userDict)
                 x = True
 
             elif cleanMSG == 'quit':
