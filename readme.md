@@ -7,7 +7,11 @@ whos the best chemist!**
 
 ## Commands
 **!askq or !askquestion: presents you with a difficulty to choose from (Easy/Medium/Hard/Any) once a difficulty is chosen you are given 60 seconds to answer before it 
-exits or you can write "quit" in the channel**
+exits or you can write "quit" in the channel** \n
+
+**!top: the leaderboard is displayed sorted based on points**
+
+
 
 ``` 
 Team Average Kailey Enjoyers
