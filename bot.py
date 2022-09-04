@@ -1,6 +1,7 @@
 import discord
 import os
 import random
+import asyncio
 from dotenv import load_dotenv
 import requests
 import io
@@ -38,33 +39,85 @@ async def on_message(message):
         if command == "hello":
             await message.channel.send('Hello!')
 
+        if command == 'help':
+            await message.channel.send('Documentation does not exist at this moment. Have a nice day!')
+
         if command == "askQuestion":
             # data =
-            data = await getReq(message)
-            dataLen = len(data)
-            index = random.randint(0, dataLen)
-            # this is the link to the image randomly choose object
-            await message.channel.send(data[index]['ImageLink'])
-            await message.channel.send('what is this?')
+            await message.channel.send('Respond with one of the following difficulities:\n(Easy/Medium/Hard/Any)')
 
-            # ans = data[index]['name'] is the answer to the question
-            # response == ans
-            # send a message to the user saying if they got it right or wrong, exit while loop,
-            # and once everything is finished work on leaderboard
-        if command == "help":
-            await message.channel.send('Help documentation is not available at the moment, please try again later')
+            try:
+                currMSG = await client.wait_for('message', timeout=60.0)
+                cleanMSG = currMSG.content.strip().lower()
+
+                try:
+                    if (cleanMSG == "easy") or (cleanMSG == "medium") or (cleanMSG == "hard") or (cleanMSG == "any"):
+                        difficulty = cleanMSG
+                        await askQuestion(message, difficulty)
+                    else:
+                        await message.channel.send('Invalid Input')
+                        return
+
+                except:
+                    await message.channel.send('Invalid Input')
+                    return
+
+            except asyncio.TimeoutError:
+                await message.channel.send("You took too long to respond")
 
 
 # gets data from the server and store into memory
 
 
-async def getReq(message):
+async def getALL(message):
     # url of the api where you're going to import
-    URL = 'http://localhost:3000/api/getAll'
+    URL = 'http://localhost:3000/api/organic_compounds'
     response = requests.get(URL)
-    # later test for response.status_code works, prob dont have to but its good practice
-    print(response.status_code)
+    # later test for response.status_code works, prob dont have to but its good practic
+    print(response.json())
     return response.json()
+
+
+async def getFromDifficulty(message, difficulty):
+    URL = 'http://localhost:3000/api/organic_compounds/' + difficulty
+    response = requests.get(URL)
+    print("wrong")
+    print(response.status_code)
+    print(response.json())
+    return response.json()
+
+
+async def askQuestion(message, difficulty):
+
+    if (difficulty == "any"):
+        data = await getALL(message)
+
+    else:
+        data = await getFromDifficulty(message, difficulty)
+
+    dataLen = len(data)
+    print('dataLen: ' + str(dataLen))
+    index = random.randint(0, dataLen)
+    print('index: ' + str(index))
+    answer = data[index]['Name'].strip().lower()
+    print("answer: " + str(answer))
+    # this is the link to the image randomly choose object
+    await message.channel.send(data[index]['ImageLink'])
+    await message.channel.send('what is this? (respond in form of "answer")')
+
+    try:
+        currMSG = await client.wait_for('message', timeout=60.0)
+        cleanMSG = currMSG.content.strip().lower()
+
+        if cleanMSG == answer:
+            await message.channel.send('Correct!')
+            # update scores/database
+
+        elif cleanMSG == 'quit':
+            await message.channel.send('You suck')
+
+    except asyncio.TimeoutError:
+        await message.channel.send('Timeout')
 
 
 client.run(DISCORD_TOKEN)
