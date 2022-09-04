@@ -1,6 +1,7 @@
 import discord
 import os
 import random
+import asyncio
 from dotenv import load_dotenv
 import requests
 import io
@@ -43,10 +44,29 @@ async def on_message(message):
             data = await getReq(message)
             dataLen = len(data)
             index = random.randint(0,dataLen)
+            answer = data[index]['Name'].strip().lower()
+            print(answer)
             await message.channel.send(data[index]['ImageLink']) # this is the link to the image randomly choose object
-            await message.channel.send('what is this?')
+            await message.channel.send('what is this? (respond in form of "answer")')
 
+
+      
+
+            try:
+              currMSG = await client.wait_for('message',timeout = 60.0)
+              print(currMSG.content)
+              if currMSG.content == answer:
+                await message.channel.send('Correct!')
+
+              elif(currMSG.content == 'quit'):
+                await message.channel.send('You suck')
             
+  
+            except asyncio.TimeoutError:
+              await message.channel.send('Timeout')
+            
+              
+                  
             # ans = data[index]['name'] is the answer to the question 
             # response == ans 
             # send a message to the user saying if they got it right or wrong, exit while loop,
@@ -63,5 +83,8 @@ async def getReq(message):
     print(response.status_code)
     return response.json()
     
+
+
+
 
 client.run(DISCORD_TOKEN)
