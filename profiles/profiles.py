@@ -15,9 +15,13 @@ DBClient = MongoClient(DATABASE_URL)
 
 db = DBClient.test
 collection = db.profiles  # the profiles object
-data = collection.find()  # all the data inside profiles
+
 
 # method that takes a dictionary and inserts it into the mongodb profiles dict
+
+def PullAll():
+    data = collection.find().sort('points')  # all the data inside profiles
+    return data
 
 
 def InsertProfile(ProfDict):
